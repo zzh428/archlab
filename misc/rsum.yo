@@ -1,0 +1,56 @@
+                      | # 软件61 赵哲晖 2016013224
+                      | 
+                      | # Execution begins at address 0 
+  0x000:              | 	.pos 0 
+  0x000: 30f400010000 | init:	irmovl Stack, %esp  	# Set up stack pointer  
+  0x006: 30f500010000 | 	irmovl Stack, %ebp  	# Set up base pointer   
+  0x00c: 8030000000   | 	call Main		# Execute main program
+  0x011: 00           | 	halt			# Terminate program 
+                      | 
+                      | # Sample linked list
+  0x018:              | .align 8
+  0x018:              | ele1:
+  0x018: 0a000000     | 		.long 0x00a
+  0x01c: 20000000     | 		.long ele2
+  0x020:              | ele2:
+  0x020: b0000000     | 		.long 0x0b0
+  0x024: 28000000     | 		.long ele3
+  0x028:              | ele3:
+  0x028: 000c0000     | 		.long 0xc00
+  0x02c: 00000000     | 		.long 0
+                      | 
+  0x030: a05f         | Main:	pushl %ebp 
+  0x032: 2045         | 	rrmovl %esp,%ebp
+  0x034: 30f218000000 | 	irmovl ele1,%edx
+  0x03a: a02f         | 	pushl %edx          # Push ele1
+  0x03c: 6300         | 	xorl %eax,%eax		# sum = 0      	
+  0x03e: 8048000000   | 	call rsum_list		# rsum_list(ele1)
+  0x043: 2054         | 	rrmovl %ebp,%esp
+  0x045: b05f         | 	popl %ebp
+  0x047: 90           | 	ret 
+                      | 
+  0x048: a05f         | rsum_list:	pushl %ebp
+  0x04a: 2045         | 	rrmovl %esp,%ebp
+  0x04c: 502508000000 | 	mrmovl 8(%ebp),%edx	# edx = ele1
+  0x052: 6222         | 	andl   %edx,%edx	# Stop when 0
+  0x054: 737e000000   | 	je     End
+  0x059: 506200000000 | Loop:	mrmovl (%edx),%esi	# get *ele
+  0x05f: a06f         | 	pushl %esi              # push *ele
+  0x061: 30f304000000 | 	irmovl $4,%ebx          
+  0x067: 6032         | 	addl %ebx,%edx          # ele++
+  0x069: 506200000000 | 	mrmovl (%edx),%esi
+  0x06f: 2062         | 	rrmovl %esi, %edx       # get next ele
+  0x071: a02f         | 	pushl %edx
+  0x073: 8048000000   | 	call rsum_list          # rsum_list(next)
+  0x078: b02f         | 	popl %edx
+  0x07a: b06f         | 	popl %esi
+  0x07c: 6060         | 	addl %esi,%eax          # add to sum
+                      | 
+  0x07e: 2054         | End:	rrmovl %ebp,%esp
+  0x080: b05f         | 	popl %ebp
+  0x082: 90           | 	ret
+                      | 
+                      | # The stack starts here and grows to lower addresses
+  0x100:              | 	.pos 0x100		
+  0x100:              | Stack:	 
+                      | 

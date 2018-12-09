@@ -1,0 +1,63 @@
+# 软件61 赵哲晖 2016013224
+
+# Execution begins at address 0 
+	.pos 0 
+init:	irmovl Stack, %esp  	# Set up stack pointer  
+	irmovl Stack, %ebp  	# Set up base pointer   
+	call Main		# Execute main program
+	halt			# Terminate program 
+
+.align 8
+#Source block
+src:
+		.long 0x00a
+		.long 0x0b0 
+		.long 0xc00
+#Destination block
+dest:
+		.long 0x111
+		.long 0x222 
+		.long 0x333	
+
+Main:	pushl %ebp 
+	rrmovl %esp,%ebp
+	irmovl $3,%eax	
+	pushl %eax		# Push 3
+	irmovl dest,%edx
+	pushl %edx      	# Push dest
+	irmovl src,%edx
+	pushl %edx      	# Push src
+	call copy_block		# copy_block(src, dest, 3)
+	rrmovl %ebp,%esp
+	popl %ebp
+	ret 
+
+
+copy_block:	pushl %ebp
+	rrmovl %esp,%ebp
+	mrmovl 16(%ebp),%ecx 	# ecx = len
+	mrmovl 12(%ebp),%edx	# edx = dest
+	mrmovl 8(%ebp),%ebx	    # ebx = src
+	xorl %eax,%eax		    # result = 0
+	andl   %ecx,%ecx	    # Stop when 0
+	je     End
+
+Loop:	mrmovl (%ebx),%esi	# get *src
+	rmmovl %esi,(%edx)      # copy *src to dest
+	pushl %edi
+	irmovl $4,%edi           
+	addl %edi,%edx          # dest++
+	addl %edi,%ebx      	# src++
+	xorl %esi,%eax          # update result
+	irmovl $-1,%edi	        # 
+	addl %edi,%ecx          # len--
+	popl %edi
+	andl   %ecx,%ecx	    # Stop when 0
+	jne    Loop             
+End:	rrmovl %ebp,%esp
+	popl %ebp
+	ret
+
+# The stack starts here and grows to lower addresses
+	.pos 0x100		
+Stack:	 
